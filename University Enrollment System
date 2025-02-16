@@ -1,0 +1,49 @@
+import java.util.HashMap;
+import java.util.Scanner;
+class CourseFullException extends Exception {
+    public CourseFullException(String message) {
+        super(message);
+    }
+}
+class PrerequisiteNotMetException extends Exception {
+    public PrerequisiteNotMetException(String message) {
+        super(message);
+    }
+}
+public class UniversityEnrollmentSystem {
+    private static final int MAX_CAPACITY = 3; // Maximum students per course
+    private static HashMap<String, Integer> courseEnrollment = new HashMap<>();
+    private static HashMap<String, String> prerequisites = new HashMap<>();
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        courseEnrollment.put("Core Java", 2);
+        courseEnrollment.put("Advanced Java", 1);
+        courseEnrollment.put("Data Structures", 0);
+        prerequisites.put("Advanced Java", "Core Java");
+        prerequisites.put("Algorithms", "Data Structures");
+        try {
+            System.out.print("Enroll in Course: ");
+            String course = scanner.nextLine();
+            if (prerequisites.containsKey(course)) {
+                System.out.print("Have you completed " + prerequisites.get(course) + "? (yes/no): ");
+                String prereqStatus = scanner.nextLine();
+                if (!prereqStatus.equalsIgnoreCase("yes")) {
+                    throw new PrerequisiteNotMetException(
+                        "Complete " + prerequisites.get(course) + " before enrolling in " + course + "."
+                    );
+                }
+            }
+            if (courseEnrollment.getOrDefault(course, 0) >= MAX_CAPACITY) {
+                throw new CourseFullException("Course " + course + " is already full.");
+            }
+            courseEnrollment.put(course, courseEnrollment.get(course) + 1);
+            System.out.println("Enrollment successful! You have been enrolled in " + course + ".");
+        } catch (PrerequisiteNotMetException | CourseFullException e) {
+            System.out.println("Error: " + e.getClass().getSimpleName() + " - " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Error: Invalid input.");
+        } finally {
+            scanner.close();
+        }
+    }
+}
